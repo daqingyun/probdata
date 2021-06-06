@@ -61,5 +61,3 @@ probdata:\
 
 clean:
 	rm *.o probdata
-	rm -rf ./log
-	rm -rf ./udt_log
