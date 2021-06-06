@@ -1,0 +1,1 @@
+Download the iperf3 package (https://software.es.net/iperf/) and compile it here
