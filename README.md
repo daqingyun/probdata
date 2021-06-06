@@ -134,4 +134,4 @@ DOI: 10.1109/TNET.2019.2943884.
 Copyright
 ---------
 
-Copyright (c) All Rights Reserved - Daqing Yun <daqingyun@gmail.com>
+Copyright (c) All Rights Reserved - Daqing Yun (daqingyun@gmail.com)
