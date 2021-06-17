@@ -60,7 +60,7 @@ int probdata_new_and_default(probdata* prob)
     prob->prob_udt_worker = NULL;
     prob->prob_tcp_worker = NULL;
     prob->m2m_record = new struct mem_record;
-	prob->m2m_record_max = new struct mem_record;
+    prob->m2m_record_max = new struct mem_record;
     
     return 0;
 }
