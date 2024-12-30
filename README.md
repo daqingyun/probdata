@@ -38,7 +38,7 @@ probdata needs the following libraries:
 ### Building probdata ###
 
 	1. Go to ./src/probdata
-	2. Issue make (tested on FC-23)
+	2. Issue make (tested on Fedora-23)
 
 Invoking probdata
 ---------------
