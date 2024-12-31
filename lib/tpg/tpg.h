@@ -3,58 +3,51 @@
  * All rights reserved - Daqing Yun <daqingyun@gmail.com>
  ***************************************************************************/
 
-#ifndef _TPG_PROFILE_H_
-#define _TPG_PROFILE_H_
+#ifndef _TPG_API_H_
+#define _TPG_API_H_
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <fstream>
 #include <vector>
-#include <cstring>
 #include <bitset>
-#include <stdarg.h>
-#include <fcntl.h>
-#include <stdarg.h>
-#include <sys/types.h>
-#include <setjmp.h>
-#include <signal.h>
-#include <sys/stat.h>
-#include <getopt.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <netinet/tcp.h>
-#include <sys/resource.h>
-#include <sys/mman.h>
-#include <pthread.h>
-#ifndef _GNU_SOURCE
-    #define _GNU_SOURCE
-#endif
-#ifndef __USE_GNU
-    #define __USE_GNU
-#endif
 
-#include <sysexits.h>
-#include <stdint.h>
-#include <error.h>
-#include <sched.h>
-#include "tpg_common.h"
-#include "tpg_conn.h"
-#include "tpg_stream.h"
-#include "tpg_protocol.h"
+// #include "tpg_common.h"
+#define T_HOSTADDR_LEN 64
+#define T_IDPKT_SIZE 32
+#define T_MAX_STREAM_NUM 128
+#define T_STRNAME_LEN 8
+#define T_PUDT 12
+extern int t_errno;
+const char *t_errstr(int);
+void t_print_short_usage();
+void t_print_long_usage();
+long long int t_get_currtime_us();
 
-//#define ANL_UCHICAGO
-
-enum tpg_program_role
+// #include "tpg_conn.h"
+struct tpg_nic2nic 
 {
-    T_UNKNOWN,
-    T_SERVER,
-    T_CLIENT
+    int id;
+    char src_ip[T_HOSTADDR_LEN];
+    char dst_ip[T_HOSTADDR_LEN];
 };
 
+// #include "tpg_protocol.h"
+struct tpg_protocol
+{
+    int protocol_id;
+    char protocol_name[T_STRNAME_LEN];
+    int (*protocol_init)(struct tpg_profile *);
+    int (*protocol_listen)(struct tpg_profile *);
+    int (*protocol_connect)(struct tpg_stream *);
+    int (*protocol_accept)(struct tpg_profile *, int);
+    int (*protocol_send)(struct tpg_stream *);
+    int (*protocol_recv)(struct tpg_stream *);
+    int (*protocol_close)(int* sockfd);
+    const char*(*protocol_str_error)();
+    void (*protocol_client_perfmon)(tpg_profile *);
+    void (*protocol_server_perfmon)(tpg_profile *);
+};
+
+// #include "tpg_profile.h"
+enum tpg_program_role { T_UNKNOWN, T_SERVER, T_CLIENT };
 struct tpg_profile
 {
     signed char status;
@@ -125,23 +118,21 @@ struct tpg_profile
     double fastprof_buffer_resolution;
     double fastprof_buffer_size_unit;
 };
-
-
-int tpg_prof_default(tpg_profile* prof);
-int tpg_prof_start_timers(tpg_profile* prof);
 int set_protocol_id(tpg_profile* prof, int protid);
 int set_role(tpg_profile* prof, tpg_program_role role);
 int set_hostname(tpg_profile* prof, char* hostname);
-int set_srcfile(tpg_profile* prof, char* src_filename);
-int set_dstfile(tpg_profile* prof, char* dst_filename);
-int set_bindaddr(tpg_profile* prof, char* hostname);
-void print_sum_perf(tpg_profile *);
-void print_partial_perf(tpg_profile* prof);
+int tpg_prof_default(tpg_profile* prof);
+int tpg_prof_start_timers(tpg_profile* prof);
 int parse_cmd_line(tpg_profile *prof, int argc, char **argv);
-unsigned long long int record_curr_tm_usec();
-double perturb();
-double rounding(double x);
-double rand_between(int x, int y);
-int generate_profile_filename(char* filename, int no_imp_limit, int max_prof_limit, int perf_gain_ratio_int, const char* enable_disable);
+
+// #include "tpg_client.h"
+int tpg_client_run(tpg_profile* prof);
+int tpg_client_clean_up(tpg_profile* prof);
+int tpg_client_reset(tpg_profile* prof);
+
+// #include "tpg_server.h"
+int tpg_server_run(tpg_profile *prof, int tmo_sec, int tmo_usec);
+int tpg_server_clean_up(tpg_profile *prof);
+int tpg_server_reset(tpg_profile *prof);
 
 #endif
