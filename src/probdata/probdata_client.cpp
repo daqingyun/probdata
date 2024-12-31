@@ -7,8 +7,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <unistd.h>
-// #include "../tpg/tpg_profile.h"
-#include <tpg_profile.h>
+#include <tpg.h>
 #include "../fastprof/fastprof.h"
 #include "../fastprof/fastprof_udt.h"
 #include "../fastprof/fastprof_tcp.h"

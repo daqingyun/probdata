@@ -6,8 +6,7 @@
 #ifndef _PROBDATA_ERROR_H_
 #define _PROBDATA_ERROR_H_
 
-// #include "../tpg/tpg_common.h" // for tpg error handler
-#include <tpg_common.h>
+#include <tpg.h> // for tpg error handler
 #include "../fastprof/fastprof_error.h"
 
 extern int p_errno;
