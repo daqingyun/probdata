@@ -10,12 +10,6 @@
 #include <ctime>
 #include <sysexits.h>
 #include <stdint.h>
-/* #include "../tpg/tpg_client.h"
-#include "../tpg/tpg_log.h"
-#include "../tpg/tpg_profile.h" */
-#include <tpg_client.h>
-#include <tpg_log.h>
-#include <tpg_profile.h>
 #include "fastprof_tcp.h"
 #include "fastprof_error.h"
 
@@ -89,14 +83,14 @@ int f_tcp_prof_default(struct fastprof_tcp_prof* prof)
     }
 }
 
-int f_tcp_theta_to_idx(double theta_val, int scale, int min_val, int max_val)
+/* int f_tcp_theta_to_idx(double theta_val, int scale, int min_val, int max_val)
 {
     int idx_val = -1;
     idx_val = (int)(rounding(theta_val * scale));
     idx_val = (idx_val <= min_val) ? (min_val) : idx_val;
     idx_val = (idx_val >= max_val) ? (max_val) : idx_val;
     return idx_val;
-}
+} */
 
 double f_tcp_theta_to_val(double theta_min, double theta_max, double val_min, double val_max, double theta)
 {

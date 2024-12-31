@@ -11,14 +11,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/socket.h>
-/* #include "../tpg/tpg_profile.h"
-#include "../tpg/tpg_log.h"
-#include "../tpg/tpg_client.h"
-#include "../tpg/tpg_server.h" */
-#include <tpg_profile.h>
-#include <tpg_log.h>
-#include <tpg_client.h>
-#include <tpg_server.h>
+#include <tpg.h>
 #include "fastprof_udt.h"
 
 // int exec(tpg_profile*);

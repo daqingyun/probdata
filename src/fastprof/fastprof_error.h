@@ -11,14 +11,12 @@
 #ifdef __cplusplus
 extern "C"{
 #endif
-    #include <iperf.h>
     #include <iperf_api.h>
 #ifdef __cplusplus
 }
 #endif
 
-// #include "../tpg/tpg_common.h"
-#include <tpg_common.h>
+#include <tpg.h>
 
 enum
 {

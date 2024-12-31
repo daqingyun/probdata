@@ -39,18 +39,16 @@
 #endif
 #include <sysexits.h>
 #include <stdint.h>
+#include <error.h>
+#include <sched.h>
 #ifdef __cplusplus
 extern "C"{
 #endif 
-    #include <iperf.h>
     #include <iperf_api.h>
 #ifdef __cplusplus
 }
 #endif
-#include <error.h>
-#include <sched.h>
-// #include "../tpg/tpg_profile.h"
-#include <tpg_profile.h>
+#include <tpg.h>
 #include "fastprof_error.h"
 #include "fastprof_log.h"
 

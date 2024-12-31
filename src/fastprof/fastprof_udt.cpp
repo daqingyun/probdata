@@ -7,14 +7,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
-/* #include "../tpg/tpg_client.h"
-#include "../tpg/tpg_server.h"
-#include "../tpg/tpg_log.h"
-#include "../tpg/tpg_profile.h" */
-#include <tpg_client.h>
-#include <tpg_server.h>
-#include <tpg_log.h>
-#include <tpg_profile.h>
 #include "fastprof_udt.h"
 
 int emul_load_2d_tab(double** two_d_table, int row, int col)

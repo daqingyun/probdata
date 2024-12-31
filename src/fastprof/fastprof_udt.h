@@ -7,6 +7,7 @@
 #define _FASTPROF_UDT_H_
 
 #include <cmath>
+#include <tpg.h>
 #include "fastprof.h"
 #include "fastprof_log.h"
 #include "fastprof_error.h"
