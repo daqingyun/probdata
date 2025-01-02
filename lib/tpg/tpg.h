@@ -9,111 +9,60 @@
 #include <vector>
 #include <bitset>
 
-// #include "tpg_common.h"
-#define T_HOSTADDR_LEN 64
-#define T_IDPKT_SIZE 32
-#define T_MAX_STREAM_NUM 128
-#define T_PUDT 12
+
+enum { T_PTCP = 10, T_PUDP = 11, T_PUDT = 12 };
 extern int t_errno;
 const char *t_errstr(int);
 void t_print_short_usage();
 void t_print_long_usage();
-long long int t_get_currtime_us();
 
-// #include "tpg_conn.h"
-struct tpg_nic2nic;
-
-// #include "tpg_protocol.h"
-struct tpg_protocol;
-
-// #include "tpg_stream.h"
-struct tpg_stream;
-
-// #include "tpg_profile.h"
 enum tpg_program_role { T_UNKNOWN, T_SERVER, T_CLIENT };
-struct tpg_profile
-{
-    signed char status;
-    pthread_mutex_t client_finish_lock;
-    std::bitset<T_MAX_STREAM_NUM> client_finish_mark;
-    pthread_mutex_t server_finish_lock;
-    int server_finish_mark;
-    pthread_t*  send_workers;
-    pthread_t*  recv_workers;
-    pthread_t   perf_mon;
-    char id_buf[T_IDPKT_SIZE];
-    long long int start_time_us;
-    long long int interval_time_us;
-    long long int end_time_us;
-    int ctrl_listen_sock;
-    int ctrl_listen_port;
-    int ctrl_accept_sock;
-    int protocol_listen_sock;
-    int protocol_listen_port;
-    int ctrl_max_sock;
-    fd_set  ctrl_read_sockset;
-    std::vector<tpg_protocol*>  protocol_list;
-    std::vector<tpg_stream*>    stream_list;
-    std::vector<tpg_nic2nic *>  connection_list;
-    
-    tpg_program_role role;
-    int is_sender;
-    int tcp_mss;
-    int tcp_sock_bufsize;
-    int udt_send_bufsize;
-    int udt_recv_bufsize;
-    int udp_send_bufsize;
-    int udp_recv_bufsize;
-    int udt_mss;
-    double udt_maxbw;
-    int blocksize;
-    char remote_ip[T_HOSTADDR_LEN];
-    char local_ip[T_HOSTADDR_LEN];
-    int local_port;
-    int prof_time_duration;
-    int is_multi_nic_enabled;
-    int total_stream_num;
-    int accept_stream_num;
-    int interval_report_flag;
-    int server_report_flag;
-    int cpu_affinity_flag;
-    double report_interval;
-    tpg_protocol* selected_protocol;
-    long long int total_sent_bytes;
-    double client_perf_mbps;
-    double server_perf_mbps;
-    
-    int fastprof_enable_flag;
-    double fastprof_bandwidth;
-    double fastprof_rtt_delay;
-    double fastprof_A_value; // not yet implemented
-    double fastprof_a_value; // not yet implemented
-    double fastprof_c_value; // not yet implemented
-    double fastprof_perf_gain_ratio;
-    int fastprof_no_imp_limit;
-    int fastprof_max_prof_limit;
-    double fastprof_block_size_min;
-    double fastprof_block_size_max;
-    double fastprof_block_size_unit;
-    double fastprof_block_resolution;
-    double fastprof_buffer_size_min;
-    double fastprof_buffer_size_max;
-    double fastprof_buffer_resolution;
-    double fastprof_buffer_size_unit;
-};
+struct tpg_profile;
 int set_protocol_id(tpg_profile*, int);
 int set_role(tpg_profile*, tpg_program_role);
 int set_hostname(tpg_profile*, char*);
 int tpg_prof_default(tpg_profile*);
-int tpg_prof_start_timers(tpg_profile*);
 int parse_cmd_line(tpg_profile*, int , char **);
 
-// #include "tpg_client.h"
+/* getters and setter wrapper */
+tpg_profile* tpg_new_profile();
+void tpg_delete_profile(tpg_profile*);
+tpg_program_role tpg_get_role(tpg_profile*);
+char* tpg_get_local_ip(tpg_profile*);
+char* tpg_get_remote_ip(tpg_profile*);
+int tpg_get_ctrl_listen_port(tpg_profile*);
+void tpg_set_ctrl_listen_port(tpg_profile*, int);
+int tpg_get_blocksize(tpg_profile*);
+void tpg_set_blocksize(tpg_profile*, int);
+int tpg_get_udt_mss(tpg_profile*);
+void tpg_set_udt_mss(tpg_profile*, int);
+int tpg_get_udt_send_bufsize(tpg_profile*);
+int tpg_get_total_stream_num(tpg_profile*);
+void tpg_set_udt_send_bufsize(tpg_profile*, int);
+void tpg_set_udt_recv_bufsize(tpg_profile*, int);
+void tpg_set_udp_send_bufsize(tpg_profile*, int);
+void tpg_set_udp_recv_bufsize(tpg_profile*, int);
+double tpg_get_client_perf_mbps(tpg_profile*);
+void tpg_set_client_perf_mbps(tpg_profile*, double);
+void tpg_set_server_perf_mbps(tpg_profile*, double);
+long long int tpg_get_total_sent_bytes(tpg_profile*);
+int tpg_get_prof_time_duration(tpg_profile*);
+void tpg_set_prof_time_duration(tpg_profile*, int);
+
+/* placeholders */
+double tpg_get_fastprof_A_value(tpg_profile*);
+double tpg_get_fastprof_c_value(tpg_profile*);
+double tpg_get_fastprof_a_value(tpg_profile*);
+double tpg_get_fastprof_rtt_delay(tpg_profile*);
+double tpg_get_fastprof_perf_gain_ratio(tpg_profile*);
+double tpg_get_fastprof_bandwidth(tpg_profile*);
+int tpg_get_fastprof_max_prof_limit(tpg_profile*);
+int tpg_get_fastprof_no_imp_limit(tpg_profile*);
+
 int tpg_client_run(tpg_profile*);
 int tpg_client_clean_up(tpg_profile*);
 int tpg_client_reset(tpg_profile*);
 
-// #include "tpg_server.h"
 int tpg_server_run(tpg_profile*, int, int);
 int tpg_server_clean_up(tpg_profile*);
 int tpg_server_reset(tpg_profile*);
