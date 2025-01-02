@@ -46,7 +46,7 @@ int probdata_client(struct probdata* prob)
     }
 
     prob->status = P_PROGRAM_START;
-    prob->start_time_us = prob->end_time_us = t_get_currtime_us();
+    // prob->start_time_us = prob->end_time_us = t_get_currtime_us(); // the profiler has timers
 
     while (prob->status != P_PROGRAM_DONE) {
         ;
@@ -75,10 +75,10 @@ int probdata_client(struct probdata* prob)
         P_LOG(P_PERF, "       SrcIP: %s", prob->prob_control->local_ip);
         P_LOG(P_PERF, "       DstIP: %s", prob->prob_control->remote_ip);
         P_LOG(P_PERF, "    Protocol: %s", "UDT");
-        P_LOG(P_PERF, "     PktSize: %d", prob->prob_udt_prof_max->udt_prof->udt_mss - 44);
-        P_LOG(P_PERF, "     BlkSize: %d", prob->prob_udt_prof_max->udt_prof->blocksize);
-        P_LOG(P_PERF, "     BufSize: %d", prob->prob_udt_prof_max->udt_prof->udt_send_bufsize);
-        P_LOG(P_PERF, "     Stream#: %d", prob->prob_udt_prof_max->udt_prof->total_stream_num);
+        P_LOG(P_PERF, "     PktSize: %d", tpg_get_udt_mss(prob->prob_udt_prof_max->udt_prof) - 44);
+        P_LOG(P_PERF, "     BlkSize: %d", tpg_get_blocksize(prob->prob_udt_prof_max->udt_prof));
+        P_LOG(P_PERF, "     BufSize: %d", tpg_get_udt_send_bufsize(prob->prob_udt_prof_max->udt_prof));
+        P_LOG(P_PERF, "     Stream#: %d", tpg_get_total_stream_num(prob->prob_udt_prof_max->udt_prof));
         P_LOG(P_PERF, "     MaxPerf: %.3lf Mbps", prob->prob_udt_prof_max->perf_Mbps);
     }
     if (prob->prob_tcp_prof_max->perf_Mbps > prob->prob_udt_prof_max->perf_Mbps &&
