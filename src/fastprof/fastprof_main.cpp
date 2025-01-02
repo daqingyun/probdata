@@ -20,7 +20,7 @@ int exec(struct fastprof_udt_prof*);
 int main(int argc, char** argv)
 {
     struct fastprof_udt_prof* prof = new struct fastprof_udt_prof;
-    prof->udt_prof = new tpg_profile;
+    prof->udt_prof = tpg_new_profile();
     
     if(tpg_prof_default(prof->udt_prof) < 0) {
         F_LOG(F_ERR, "default setting profile error %s", 
@@ -28,10 +28,11 @@ int main(int argc, char** argv)
         exit(1);
     }
     
-    if (tpg_prof_start_timers(prof->udt_prof) < 0) {
-        F_LOG(F_ERR, "program timers are started");
-        exit(1);
-    }
+    // TPG will start these timers
+    // if (tpg_prof_start_timers(prof->udt_prof) < 0) {
+    //     F_LOG(F_ERR, "program timers are started");
+    //     exit(1);
+    // }
     
     if (parse_cmd_line(prof->udt_prof, argc, argv) < 0) {
         F_LOG(F_PERF, "parameter parsing error: %s",
@@ -56,29 +57,29 @@ int exec(struct fastprof_udt_prof* prof)
     
     ctrl.alpha = 0.602;
     ctrl.gamma = 0.101;
-    ctrl.A_val = prof->udt_prof->fastprof_A_value;
-    ctrl.c_val = prof->udt_prof->fastprof_c_value;
-    ctrl.a_val = prof->udt_prof->fastprof_a_value;
-    ctrl.impeded_limit = prof->udt_prof->fastprof_no_imp_limit;
-    ctrl.max_limit = prof->udt_prof->fastprof_max_prof_limit;
-    ctrl.bw_bps = prof->udt_prof->fastprof_bandwidth;
-    ctrl.duration = prof->udt_prof->prof_time_duration;
+    ctrl.A_val = tpg_get_fastprof_A_value(prof->udt_prof);
+    ctrl.c_val = tpg_get_fastprof_c_value(prof->udt_prof);
+    ctrl.a_val = tpg_get_fastprof_a_value(prof->udt_prof);
+    ctrl.impeded_limit = tpg_get_fastprof_no_imp_limit(prof->udt_prof);
+    ctrl.max_limit = tpg_get_fastprof_max_prof_limit(prof->udt_prof);
+    ctrl.bw_bps = tpg_get_fastprof_bandwidth(prof->udt_prof);
+    ctrl.duration = tpg_get_prof_time_duration(prof->udt_prof);
     memcpy(ctrl.local_ip, 
-            prof->udt_prof->local_ip,
-            strlen(prof->udt_prof->local_ip));
-    ctrl.local_ip[strlen(prof->udt_prof->local_ip)] = '\0';
+            tpg_get_local_ip(prof->udt_prof),
+            strlen(tpg_get_local_ip(prof->udt_prof)));
+    ctrl.local_ip[strlen(tpg_get_local_ip(prof->udt_prof))] = '\0';
     memcpy(ctrl.remote_ip,
-            prof->udt_prof->remote_ip,
-            strlen(prof->udt_prof->remote_ip));
-    ctrl.remote_ip[strlen(prof->udt_prof->remote_ip)] = '\0';
-    ctrl.mss = prof->udt_prof->udt_mss;
-    ctrl.pgr = prof->udt_prof->fastprof_perf_gain_ratio;
-    ctrl.rtt_ms = prof->udt_prof->fastprof_rtt_delay;
-    ctrl.udt_port = prof->udt_prof->ctrl_listen_port;
+            tpg_get_remote_ip(prof->udt_prof),
+            strlen(tpg_get_remote_ip(prof->udt_prof)));
+    ctrl.remote_ip[strlen(tpg_get_remote_ip(prof->udt_prof))] = '\0';
+    ctrl.mss = tpg_get_udt_mss(prof->udt_prof);
+    ctrl.pgr = tpg_get_fastprof_perf_gain_ratio(prof->udt_prof);
+    ctrl.rtt_ms = tpg_get_fastprof_rtt_delay(prof->udt_prof);
+    ctrl.udt_port = tpg_get_ctrl_listen_port(prof->udt_prof);
     
     int err_cnt = 0;
     
-    switch(prof->udt_prof->role)
+    switch (tpg_get_role(prof->udt_prof))
     {
         case T_SERVER:
         {
