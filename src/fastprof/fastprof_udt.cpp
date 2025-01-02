@@ -34,7 +34,7 @@ int emul_load_2d_tab(double** two_d_table, int row, int col)
 struct fastprof_udt_prof* f_udt_prof_new()
 {
     struct fastprof_udt_prof* prof = new struct fastprof_udt_prof;
-    prof->udt_prof = new struct tpg_profile;
+    prof->udt_prof = tpg_new_profile();
     return prof;
 }
 
@@ -57,9 +57,9 @@ int f_udt_prof_init(struct fastprof_udt_prof* prof, struct fastprof_ctrl* ctrl)
     (prof->udt_prof->local_ip)[strlen(ctrl->local_ip)] = '\0';
 #endif
     set_hostname(prof->udt_prof, ctrl->remote_ip);
-    prof->udt_prof->ctrl_listen_port = ctrl->udt_port;    
-    prof->udt_prof->udt_mss = ctrl->mss;    
-    prof->udt_prof->prof_time_duration = ctrl->duration;
+    tpg_set_ctrl_listen_port(prof->udt_prof, ctrl->udt_port);
+    tpg_set_udt_mss(prof->udt_prof, ctrl->mss);
+    tpg_set_prof_time_duration(prof->udt_prof, ctrl->duration);
     
     return 0;
 }
@@ -102,8 +102,7 @@ int f_udt_prof_delete(struct fastprof_udt_prof* prof)
         return -1;
     }
     if (prof->udt_prof != NULL) {
-        delete prof->udt_prof;
-        prof->udt_prof = NULL;
+        tpg_delete_profile(prof->udt_prof);
     }
     
     return 0;
@@ -399,14 +398,16 @@ int f_udt_client_run(struct fastprof_udt_prof* prof, struct fastprof_udt_prof* p
         block_size = f_udt_theta_to_val(block_theta_min, block_theta_max, block_size_min, block_size_max, theta_plus[0]);
         buffer_size = f_udt_theta_to_val(buffer_theta_min, buffer_theta_max, buffer_size_min, buffer_size_max, theta_plus[1]);
         
-        prof->udt_prof->blocksize = (int)(f_round(block_size * block_unit));
-        prof->udt_prof->udt_send_bufsize = prof->udt_prof->udt_recv_bufsize = (int)(f_round(buffer_size * buffer_unit));
-        prof->udt_prof->udp_send_bufsize = prof->udt_prof->udp_recv_bufsize = (int)(f_round(buffer_size * buffer_unit * 0.5));
+        tpg_set_blocksize(prof->udt_prof, (int)(f_round(block_size * block_unit)));
+        tpg_set_udt_send_bufsize(prof->udt_prof, (int)(f_round(buffer_size * buffer_unit)));
+        tpg_set_udt_recv_bufsize(prof->udt_prof, (int)(f_round(buffer_size * buffer_unit)));
+        tpg_set_udp_send_bufsize(prof->udt_prof, (int)(f_round(buffer_size * buffer_unit * 0.5)));
+        tpg_set_udp_recv_bufsize(prof->udt_prof, (int)(f_round(buffer_size * buffer_unit * 0.5)));
         
-        F_LOG(F_PERF, "*** y(+): %.3lf %.3lf [%d, %d]", block_size, buffer_size, prof->udt_prof->blocksize, prof->udt_prof->udt_send_bufsize);
+        F_LOG(F_PERF, "*** y(+): %.3lf %.3lf [%d, %d]", block_size, buffer_size, tpg_get_blocksize(prof->udt_prof), tpg_get_udt_send_bufsize(prof->udt_prof));
         
-        prof->udt_prof->client_perf_mbps = 0.0;
-        prof->udt_prof->server_perf_mbps = 0.0;
+        tpg_set_client_perf_mbps(prof->udt_prof, 0.0);
+        tpg_set_server_perf_mbps(prof->udt_prof, 0.0);
 
         y_plus_Gbps = 0.0;
         
@@ -414,7 +415,7 @@ int f_udt_client_run(struct fastprof_udt_prof* prof, struct fastprof_udt_prof* p
             F_LOG(F_HINT, "tpg_client_run() fails %s", f_errstr(f_errno));
             return -1;
         } else {
-            prof->perf_Mbps = prof->udt_prof->client_perf_mbps;
+            prof->perf_Mbps = tpg_get_client_perf_mbps(prof->udt_prof);
             y_plus_Gbps = prof->perf_Mbps / 1000.0;
             
             F_LOG(F_HINT, "record the current tpg prof");
@@ -462,14 +463,16 @@ int f_udt_client_run(struct fastprof_udt_prof* prof, struct fastprof_udt_prof* p
         block_size = f_udt_theta_to_val(block_theta_min, block_theta_max, block_size_min, block_size_max, theta_minus[0]);
         buffer_size = f_udt_theta_to_val(buffer_theta_min, buffer_theta_max, buffer_size_min, buffer_size_max, theta_minus[1]);
         
-        prof->udt_prof->blocksize = (int)(f_round(block_size * block_unit));
-        prof->udt_prof->udt_send_bufsize = prof->udt_prof->udt_recv_bufsize = (int)(f_round(buffer_size * buffer_unit));
-        prof->udt_prof->udp_send_bufsize = prof->udt_prof->udp_recv_bufsize = (int)(f_round(buffer_size * buffer_unit * 0.5));
+        tpg_set_blocksize(prof->udt_prof, (int)(f_round(block_size * block_unit)));
+        tpg_set_udt_send_bufsize(prof->udt_prof, (int)(f_round(buffer_size * buffer_unit)));
+        tpg_set_udt_recv_bufsize(prof->udt_prof, (int)(f_round(buffer_size * buffer_unit)));
+        tpg_set_udp_send_bufsize(prof->udt_prof, (int)(f_round(buffer_size * buffer_unit * 0.5)));
+        tpg_set_udp_recv_bufsize(prof->udt_prof, (int)(f_round(buffer_size * buffer_unit * 0.5)));
 
-        F_LOG(F_PERF, "*** y(-): %.3lf %.3lf [%d, %d]", block_size, buffer_size, prof->udt_prof->blocksize, prof->udt_prof->udt_send_bufsize);
+        F_LOG(F_PERF, "*** y(-): %.3lf %.3lf [%d, %d]", block_size, buffer_size, tpg_get_blocksize(prof->udt_prof), tpg_get_udt_send_bufsize(prof->udt_prof));
         
-        prof->udt_prof->client_perf_mbps = 0.0;
-        prof->udt_prof->server_perf_mbps = 0.0;
+        tpg_set_client_perf_mbps(prof->udt_prof, 0.0);
+        tpg_set_server_perf_mbps(prof->udt_prof, 0.0);
         
         y_minus_Gbps = 0.0;
         
@@ -477,7 +480,7 @@ int f_udt_client_run(struct fastprof_udt_prof* prof, struct fastprof_udt_prof* p
             f_errno = F_ERR_ERROR;
             return -1;
         } else {
-            prof->perf_Mbps = prof->udt_prof->client_perf_mbps;
+            prof->perf_Mbps = tpg_get_client_perf_mbps(prof->udt_prof);
             y_minus_Gbps = prof->perf_Mbps / 1000.0;
             
             F_LOG(F_HINT, "record the current tpg prof");
@@ -534,14 +537,16 @@ int f_udt_client_run(struct fastprof_udt_prof* prof, struct fastprof_udt_prof* p
         block_size = f_udt_theta_to_val(block_theta_min, block_theta_max, block_size_min, block_size_max, theta[0]);
         buffer_size = f_udt_theta_to_val(buffer_theta_min, buffer_theta_max, buffer_size_min, buffer_size_max, theta[1]);
 
-        prof->udt_prof->blocksize = (int)(f_round(block_size * block_unit));
-        prof->udt_prof->udt_send_bufsize = prof->udt_prof->udt_recv_bufsize = (int)(f_round(buffer_size * buffer_unit));
-        prof->udt_prof->udp_send_bufsize = prof->udt_prof->udp_recv_bufsize = (int)(f_round(buffer_size * buffer_unit * 0.5));
+        tpg_set_blocksize(prof->udt_prof, (int)(f_round(block_size * block_unit)));
+        tpg_set_udt_send_bufsize(prof->udt_prof, (int)(f_round(buffer_size * buffer_unit)));
+        tpg_set_udt_recv_bufsize(prof->udt_prof, (int)(f_round(buffer_size * buffer_unit)));
+        tpg_set_udp_send_bufsize(prof->udt_prof, (int)(f_round(buffer_size * buffer_unit * 0.5)));
+        tpg_set_udp_recv_bufsize(prof->udt_prof, (int)(f_round(buffer_size * buffer_unit * 0.5)));
 
-        F_LOG(F_PERF, "*** y(*): %.3lf %.3lf [%d, %d]", block_size, buffer_size, prof->udt_prof->blocksize, prof->udt_prof->udt_send_bufsize);
+        F_LOG(F_PERF, "*** y(*): %.3lf %.3lf [%d, %d]", block_size, buffer_size, tpg_get_blocksize(prof->udt_prof), tpg_get_udt_send_bufsize(prof->udt_prof));
 
-        prof->udt_prof->client_perf_mbps = 0.0;
-        prof->udt_prof->server_perf_mbps = 0.0;
+        tpg_set_client_perf_mbps(prof->udt_prof, 0.0);
+        tpg_set_server_perf_mbps(prof->udt_prof, 0.0);
         
         y_star_Gbps = 0.0;
         
@@ -549,7 +554,7 @@ int f_udt_client_run(struct fastprof_udt_prof* prof, struct fastprof_udt_prof* p
             f_errno = F_ERR_ERROR;
             return -1;
         } else {
-            prof->perf_Mbps = prof->udt_prof->client_perf_mbps;
+            prof->perf_Mbps = tpg_get_client_perf_mbps(prof->udt_prof);
             y_star_Gbps = prof->perf_Mbps / 1000.0;
             
             F_LOG(F_HINT, "record the current tpg prof");
@@ -608,10 +613,10 @@ int f_udt_client_run(struct fastprof_udt_prof* prof, struct fastprof_udt_prof* p
     F_LOG(F_PERF, "    SrcIP:    %s", ctrl->local_ip);
     F_LOG(F_PERF, "    DstIP:    %s", ctrl->remote_ip);
     F_LOG(F_PERF, "    Protocol: %s", "UDT");
-    F_LOG(F_PERF, "    PktSize:  %d", prof_max->udt_prof->udt_mss - 44);
-    F_LOG(F_PERF, "    BlkSize:  %d", prof_max->udt_prof->blocksize);
-    F_LOG(F_PERF, "    BufSize:  %d", prof_max->udt_prof->udt_send_bufsize);
-    F_LOG(F_PERF, "    Stream#:  %d", prof_max->udt_prof->total_stream_num);
+    F_LOG(F_PERF, "    PktSize:  %d", tpg_get_udt_mss(prof_max->udt_prof) - 44);
+    F_LOG(F_PERF, "    BlkSize:  %d", tpg_get_blocksize(prof_max->udt_prof));
+    F_LOG(F_PERF, "    BufSize:  %d", tpg_get_udt_send_bufsize(prof_max->udt_prof));
+    F_LOG(F_PERF, "    Stream#:  %d", tpg_get_total_stream_num(prof_max->udt_prof));
     F_LOG(F_PERF, "    MaxPerf:  %.3lf Mbps", prof_max->perf_Mbps);
     F_LOG(F_PERF, "    Impeded:  %d", ctrl->impeded_limit);
     F_LOG(F_PERF, "    Maximal:  %d", ctrl->max_limit);
@@ -679,21 +684,21 @@ int f_udt_m2m_record_compose(struct fastprof_udt_prof * prof, struct mem_record 
     memcpy(record->toolkit_name, "tpg", strlen("tpg"));
     record->toolkit_name[strlen("tpg")] = '\0';
 
-    record->num_streams = prof->udt_prof->total_stream_num;
-    record->mss_size = prof->udt_prof->udt_mss;
-    record->buffer_size = prof->udt_prof->udt_send_bufsize;
+    record->num_streams = tpg_get_total_stream_num(prof->udt_prof);
+    record->mss_size = tpg_get_udt_mss(prof->udt_prof);
+    record->buffer_size = tpg_get_udt_send_bufsize(prof->udt_prof);
     memcpy(record->buffer_size_unit, "B", strlen("B"));
     record->buffer_size_unit[strlen("B")] = '\0';
-    record->block_size = prof->udt_prof->blocksize;
+    record->block_size = tpg_get_blocksize(prof->udt_prof);
     memcpy(record->block_size_unit, "B", strlen("B"));
     record->block_size_unit[strlen("B")] = '\0';
-    record->duration = prof->udt_prof->prof_time_duration;
+    record->duration = tpg_get_prof_time_duration(prof->udt_prof);
     memcpy(record->duration_unit, "sec", strlen("sec"));
     record->duration_unit[strlen("sec")] = '\0';
-    record->trans_size = prof->udt_prof->total_sent_bytes;
+    record->trans_size = tpg_get_total_sent_bytes(prof->udt_prof);
     memcpy(record->trans_size_unit, "B", strlen("B"));
     record->trans_size_unit[strlen("B")] = '\0';
-    record->average_perf = prof->udt_prof->client_perf_mbps;
+    record->average_perf = tpg_get_client_perf_mbps(prof->udt_prof);
     memcpy(record->average_perf_unit, "Mbps", strlen("Mbps"));
     record->average_perf_unit[strlen("Mbps")] = '\0';
 
