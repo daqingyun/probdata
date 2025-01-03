@@ -34,7 +34,7 @@ int emul_load_2d_tab(double** two_d_table, int row, int col)
 struct fastprof_udt_prof* f_udt_prof_new()
 {
     struct fastprof_udt_prof* prof = new struct fastprof_udt_prof;
-    prof->udt_prof = tpg_new_profile();
+    tpg_new_profile(&(prof->udt_prof));
     return prof;
 }
 
@@ -102,7 +102,7 @@ int f_udt_prof_delete(struct fastprof_udt_prof* prof)
         return -1;
     }
     if (prof->udt_prof != NULL) {
-        tpg_delete_profile(prof->udt_prof);
+        tpg_delete_profile(&(prof->udt_prof));
     }
     
     return 0;
