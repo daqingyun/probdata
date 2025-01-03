@@ -710,9 +710,15 @@ int f_udt_m2m_record_add(struct fastprof_udt_prof * prof, struct mem_record *rec
     struct stat st = {0};
     FILE *f = NULL;
     char filename[256];
+    char command[128];
 
+    snprintf(command, sizeof(command), "mkdir -p %s", F_DEFAULT_M2M_FOLDER);
     if (stat(F_DEFAULT_M2M_FOLDER, &st) == -1) {
-        mkdir(F_DEFAULT_M2M_FOLDER, 0700);
+        if (system(command) != 0) {
+            F_LOG(F_ERR, "Cannot create folder %s %s", F_DEFAULT_M2M_FOLDER, strerror(errno));
+        } else {
+            F_LOG(F_HINT, "profile folder <%s> created", F_DEFAULT_M2M_FOLDER);
+        }
     } else {
         F_LOG(F_HINT, "profile folder <%s> exists", F_DEFAULT_M2M_FOLDER);
     }
