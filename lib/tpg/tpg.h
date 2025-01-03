@@ -25,8 +25,8 @@ int tpg_prof_default(tpg_profile*);
 int parse_cmd_line(tpg_profile*, int , char **);
 
 /* getters and setter wrapper */
-tpg_profile* tpg_new_profile();
-void tpg_delete_profile(tpg_profile*);
+void tpg_new_profile(tpg_profile**);
+void tpg_delete_profile(tpg_profile**);
 tpg_program_role tpg_get_role(tpg_profile*);
 char* tpg_get_local_ip(tpg_profile*);
 char* tpg_get_remote_ip(tpg_profile*);
